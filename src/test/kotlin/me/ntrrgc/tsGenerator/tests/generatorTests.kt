@@ -117,6 +117,24 @@ class ClassWithAny(val required: Any, val optional: Any?)
 class ClassWithMap(val values: Map<String, String>)
 class ClassWithEnumMap(val values: Map<Direction, String>)
 
+class Parent(
+    val childA: Child,
+    val childB: Child?,
+    val item: Child.Item
+) {
+    class Child(
+        val prop: String,
+        val item: Item,
+    ) {
+
+        class Item(
+            val id: Long,
+        )
+
+    }
+}
+
+
 class Tests: Spek({
     it("handles empty class") {
         assertGeneratedCode(Empty::class, setOf("""
@@ -513,5 +531,25 @@ interface Widget {
         values: { [key in Direction]: string };
     }
     """))
+    }
+
+    it("handles nested classes") {
+    """
+        interface ParentChildItem {
+            id: number;
+        }
+
+        interface ParentChild {
+            item: ParentChildItem;
+            prop: string;
+        }
+
+        interface Parent {
+            childA: ParentChild;
+            childB: ParentChild | null;
+            item: ParentChildItem;
+        }
+        
+    """.trimIndent()
     }
 })

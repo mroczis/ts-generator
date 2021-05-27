@@ -25,6 +25,7 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.superclasses
 import kotlin.reflect.jvm.javaType
+import kotlin.reflect.jvm.jvmName
 
 /**
  * TypeScript definition generator.
@@ -115,7 +116,7 @@ class TypeScriptGenerator(
 
     private fun formatClassType(type: KClass<*>): String {
         visitClass(type)
-        return type.simpleName!!
+        return type.jvmName.split(".").last().replace("$", "")
     }
 
     private fun formatKType(kType: KType): TypeScriptType {
@@ -189,7 +190,8 @@ class TypeScriptGenerator(
     }
 
     private fun generateEnum(klass: KClass<*>): String {
-        return "type ${klass.simpleName} = ${klass.java.enumConstants
+        val name = klass.jvmName.split(".").last().replace("$", "")
+        return "type $name = ${klass.java.enumConstants
             .map { constant: Any ->
                 constant.toString().toJSString()
             }
@@ -226,7 +228,8 @@ class TypeScriptGenerator(
             ""
         }
 
-        return "interface ${klass.simpleName}$templateParameters$extendsString {\n" +
+        val name = klass.jvmName.split(".").last().replace("$", "")
+        return "interface $name$templateParameters$extendsString {\n" +
             klass.declaredMemberProperties
                 .filter { !isFunctionType(it.returnType.javaType) }
                 .filter {
